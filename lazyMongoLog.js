@@ -35,10 +35,20 @@ export function newLazyMongoLog(collection = undefined) {
             };
 
         if (_collection != null)
-            await _collection.insertOne(logSchema({
-                type,
-                message: text
-            }));
+            try {
+                const result =
+                    await _collection.insertOne(logSchema({
+                        type,
+                        message: text
+                    }));
+
+                return result.acknowledged;
+
+            } catch (e) {
+                return false;
+            }
+
+        return true;
     }
 
     /**
@@ -53,7 +63,7 @@ export function newLazyMongoLog(collection = undefined) {
         message = undefined,
         ...optionalParams
     ) {
-        await write(message, optionalParams, 'info');
+        return await write(message, optionalParams, 'info');
     }
 
     print.info = print;
@@ -69,7 +79,7 @@ export function newLazyMongoLog(collection = undefined) {
         message = undefined,
         ...optionalParams
     ) {
-        await write(message, optionalParams, 'info', false);
+        return await write(message, optionalParams, 'info', false);
     };
 
     /**
@@ -83,7 +93,7 @@ export function newLazyMongoLog(collection = undefined) {
         message = undefined,
         ...optionalParams
     ) {
-        await write(message, optionalParams, 'warning');
+        return await write(message, optionalParams, 'warning');
     };
 
     /**
@@ -97,7 +107,7 @@ export function newLazyMongoLog(collection = undefined) {
         message = undefined,
         ...optionalParams
     ) {
-        await write(message, optionalParams, 'warning', false);
+        return await write(message, optionalParams, 'warning', false);
     };
 
     /**
@@ -111,7 +121,7 @@ export function newLazyMongoLog(collection = undefined) {
         message = undefined,
         ...optionalParams
     ) {
-        await write(message, optionalParams, 'error');
+        return await write(message, optionalParams, 'error');
     };
 
     /**
@@ -125,7 +135,7 @@ export function newLazyMongoLog(collection = undefined) {
         message = undefined,
         ...optionalParams
     ) {
-        await write(message, optionalParams, 'error', false);
+        return await write(message, optionalParams, 'error', false);
     };
 
     /**
@@ -142,7 +152,7 @@ export function newLazyMongoLog(collection = undefined) {
         message = undefined,
         ...optionalParams
     ) {
-        await write(message, optionalParams, type);
+        return await write(message, optionalParams, type);
     };
 
     /**
@@ -159,7 +169,7 @@ export function newLazyMongoLog(collection = undefined) {
         message = undefined,
         ...optionalParams
     ) {
-        await write(message, optionalParams, type, false);
+        return await write(message, optionalParams, type, false);
     };
 
     /**
