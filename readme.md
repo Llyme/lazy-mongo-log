@@ -64,4 +64,7 @@ print.error('Something bad happened!'); // MongoDB: type = 'error'
 print.custom('my lair', 'Welcome!'); // MongoDB: type = 'my lair'
 
 print.infoNoConsole('The console can\'t hear us!'); // Console: ...
+
+// You can wait for it to finish.
+await print.info('It takes time to insert a document.');
 ```
