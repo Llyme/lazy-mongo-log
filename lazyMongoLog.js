@@ -3,22 +3,56 @@ import { format } from 'util';
 import { logSchema } from './schemas.js';
 
 /**
- * @param {Collection?} collection
- * The mongo collection.
+ * @typedef {Object} Configuration
  * 
+ * @property {Collection} [collection]
+ * The MongoDB collection.
+ * 
+ * Default value is `null`.
+ * 
+ * @property {string} [keyword]
+ * Optional keyword that will be included in the log.
+ * 
+ * Default value is `null`.
+ * 
+ * @property {boolean} [useConsole]
+ * If the message should also be printed on the console.
+ * 
+ * Default value is `true`.
+ * 
+ * @property {string} [type]
+ * The default log type.
+ * 
+ * Default value is `info`.
+ * 
+ * @property {(message: string, type: string, keyword: string?) => Promise<object>|object} [customLogCallback]
+ * Allows changing how the log document is inserted
+ * to the collection.
+ * 
+ * Default value is `null`.
  */
-export function newLazyMongoLog(collection = undefined) {
-    let _collection = collection;
+
+/**
+ * @param {Configuration} config
+ */
+export function newLazyMongoLog(config = {}) {
+    let _config = config;
 
     async function write(
         message,
         optionalParams,
-        type,
-        use_console = true
+        type
     ) {
+        const {
+            collection,
+            keyword,
+            customLogCallback,
+            useConsole = true
+        } = _config;
+
         const text = format(message, ...optionalParams);
 
-        if (use_console)
+        if (useConsole)
             switch (type) {
                 case 'warning':
                     console.warn(message, ...optionalParams);
@@ -34,13 +68,18 @@ export function newLazyMongoLog(collection = undefined) {
                     break;
             };
 
-        if (_collection != null)
+        if (collection != null)
             try {
+                const document =
+                    customLogCallback != null
+                        ? await customLogCallback(text, type, keyword)
+                        : logSchema({
+                            type,
+                            message: text,
+                            keyword
+                        });
                 const result =
-                    await _collection.insertOne(logSchema({
-                        type,
-                        message: text
-                    }));
+                    await collection.insertOne(document);
 
                 return result.acknowledged;
 
@@ -63,24 +102,14 @@ export function newLazyMongoLog(collection = undefined) {
         message = undefined,
         ...optionalParams
     ) {
-        return await write(message, optionalParams, 'info');
+        const {
+            type = 'info'
+        } = _config;
+
+        return await write(message, optionalParams, type);
     }
 
     print.info = print;
-
-    /**
-     * Will not write to console.
-     * 
-     * Type = `info`
-     * @param {any} message 
-     * @param  {...any} optionalParams 
-     */
-    print.infoNoConsole = async function (
-        message = undefined,
-        ...optionalParams
-    ) {
-        return await write(message, optionalParams, 'info', false);
-    };
 
     /**
      * Functions the same way as `console.warn(...)`.
@@ -94,20 +123,6 @@ export function newLazyMongoLog(collection = undefined) {
         ...optionalParams
     ) {
         return await write(message, optionalParams, 'warning');
-    };
-
-    /**
-     * Will not write to console.
-     * 
-     * Type = `warning`
-     * @param {any} message 
-     * @param  {...any} optionalParams 
-     */
-    print.warnNoConsole = async function (
-        message = undefined,
-        ...optionalParams
-    ) {
-        return await write(message, optionalParams, 'warning', false);
     };
 
     /**
@@ -125,59 +140,26 @@ export function newLazyMongoLog(collection = undefined) {
     };
 
     /**
-     * Will not write to console.
+     * Create a new logger with the given configuration.
      * 
-     * Type = `error`
-     * @param {any} message 
-     * @param  {...any} optionalParams 
+     * Omitted fields will use the current configuration.
+     * @param {Configuration} config 
      */
-    print.errorNoConsole = async function (
-        message = undefined,
-        ...optionalParams
-    ) {
-        return await write(message, optionalParams, 'error', false);
+    print.using = function (config = {}) {
+        return newLazyMongoLog({
+            ..._config,
+            ...config
+        });
     };
 
     /**
-     * Write a log with a custom log type.
+     * Permanently modify the current configuration.
      * 
-     * @param {string} type
-     * The type of log this should be.
-     * 
-     * @param {any} message 
-     * @param  {...any} optionalParams 
+     * Omitted fields will use the current configuration.
+     * @param {Configuration} config 
      */
-    print.custom = async function (
-        type,
-        message = undefined,
-        ...optionalParams
-    ) {
-        return await write(message, optionalParams, type);
-    };
-
-    /**
-     * Will not write to console.
-     * 
-     * @param {string} type
-     * The type of log this should be.
-     * 
-     * @param {any} message 
-     * @param  {...any} optionalParams 
-     */
-    print.customNoConsole = async function (
-        type,
-        message = undefined,
-        ...optionalParams
-    ) {
-        return await write(message, optionalParams, type, false);
-    };
-
-    /**
-     * 
-     * @param {Collection} collection 
-     */
-    print.setCollection = function (collection) {
-        _collection = collection;
+    print.set = function (config) {
+        _config = config;
     };
 
     return print;
