@@ -58,10 +58,10 @@ const print = newLazyMongoLog({
 
     // Don't like the log document schema?
     // You can change it here!
-    customLogCallback(message, type, keyword) {
+    logSelector(document) {
         return {
-            super_message: message,
-            secret_type: type,
+            super_message: document.message,
+            secret_type: document.type,
             // I don't want your damn keywords!
             hello: 'world!'
         };

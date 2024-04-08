@@ -25,7 +25,7 @@ import { logSchema } from './schemas.js';
  * 
  * Default value is `info`.
  * 
- * @property {(message: string, type: string, keyword: string?) => Promise<object>|object} [customLogCallback]
+ * @property {(document: object) => Promise<object>|object} [logSelector]
  * Allows changing how the log document is inserted
  * to the collection.
  * 
@@ -46,7 +46,7 @@ export function newLazyMongoLog(config = {}) {
         const {
             collection,
             keyword,
-            customLogCallback,
+            logSelector,
             useConsole = true
         } = _config;
 
@@ -70,14 +70,15 @@ export function newLazyMongoLog(config = {}) {
 
         if (collection != null)
             try {
-                const document =
-                    customLogCallback != null
-                        ? await customLogCallback(text, type, keyword)
-                        : logSchema({
-                            type,
-                            message: text,
-                            keyword
-                        });
+                let document = logSchema({
+                    type,
+                    message: text,
+                    keyword
+                });
+
+                if (logSelector != null)
+                    document = await logSelector(document);
+
                 const result =
                     await collection.insertOne(document);
 

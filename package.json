@@ -1,6 +1,6 @@
 {
   "name": "lazy-mongo-log",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Write to MongoDB while you print!",
   "main": "index.js",
   "type": "module",
