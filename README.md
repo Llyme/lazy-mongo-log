@@ -127,7 +127,7 @@ log.using(
     keyword="bears",
 ).using(
     collection=mySuperCoolCollection,
-    keyword="why are you doing this?!"
+    keyword="why are you doing this?!",
 ).warn("Because, why not?")
 ```
 
