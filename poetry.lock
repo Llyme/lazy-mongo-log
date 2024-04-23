@@ -22,13 +22,13 @@ wmi = ["wmi (>=1.5.1)"]
 
 [[package]]
 name = "lazy-schema"
-version = "0.2.1"
+version = "0.2.6"
 description = ""
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "lazy_schema-0.2.1-py3-none-any.whl", hash = "sha256:17c5ebf75a71e6a8caf49b6eee5c5221d6286e5ce8c5849b3d5685cbb6691d95"},
-    {file = "lazy_schema-0.2.1.tar.gz", hash = "sha256:d641f7b25f29616d0993785c925b1f8b3b272469650e96b29996d0e976e3c6a5"},
+    {file = "lazy_schema-0.2.6-py3-none-any.whl", hash = "sha256:0ed1de18c6d35e8817924b803b0432a3e37020cfbed9f8a3ec2a2a9b2d76d7bf"},
+    {file = "lazy_schema-0.2.6.tar.gz", hash = "sha256:9500a11bcb6a3c9b4424b015b473b00ccf4966eaf52744eae177468c388d315e"},
 ]
 
 [[package]]
@@ -137,4 +137,4 @@ zstd = ["zstandard"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "a232af634d312242e698cc559c95a64b74668de4ba91626102ce8157c6386dba"
+content-hash = "8819b1abd9c15995b5b70462191d00bc424fddba0c32d607cb29d3c76b61ed21"

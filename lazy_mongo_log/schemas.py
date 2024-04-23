@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
-from lazy_schema import Schema
+from lazy_schema import schema
 
-log_schema = Schema.new(
+log_schema = schema(
     message="",
     type="info",
     keyword=None,

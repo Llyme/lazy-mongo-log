@@ -164,6 +164,9 @@ class LazyMongoLog:
                 if log_selector != None:
                     document = log_selector(document, **kwargs)
 
+                if document == None:
+                    return False
+
                 result = self.collection.insert_one(document)
 
                 return result.acknowledged
